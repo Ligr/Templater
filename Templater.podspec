@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'Templater'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of Templater.'
+  s.summary          = 'Framework that process data using templates.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -17,11 +17,11 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
-TODO: Add long description of the pod here.
-                       DESC
+#   s.description      = <<-DESC
+# TODO: Add long description of the pod here.
+#                        DESC
 
-  s.homepage         = 'https://github.com/Ligr/Templater'
+  s.homepage         = 'https://github.com/Ligr'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Ligr' => 'aliaksandr.huryn@gmail.com' }
@@ -30,7 +30,21 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'Templater/Classes/**/*'
+  s.default_subspecs = 'TemplaterCore', 'TemplaterActions'
+
+  s.subspec 'TemplaterCore' do |sp|
+    sp.source_files = 'Templater/Classes/TemplaterCore/**/*'
+  end
+
+  s.subspec 'TemplaterActions' do |sp|
+    sp.source_files = 'Templater/Classes/TemplaterActions/**/*'
+    sp.dependency 'Templater/TemplaterCore'
+    sp.dependency 'CryptoSwift', '~> 0.6'
+    sp.dependency 'LPXML', '~> 0.1'
+    sp.dependency 'Alamofire', '~> 4.2'
+  end
+
+  # s.source_files = 'Templater/Classes/**/*'
   
   # s.resource_bundles = {
   #   'Templater' => ['Templater/Assets/*.png']

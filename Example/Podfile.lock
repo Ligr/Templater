@@ -1,0 +1,36 @@
+PODS:
+  - Alamofire (4.5.0)
+  - CryptoSwift (0.6.9)
+  - LPXML (0.1.0)
+  - Nimble (5.1.1)
+  - Quick (1.0.0)
+  - Templater (0.1.0):
+    - Templater/TemplaterActions (= 0.1.0)
+    - Templater/TemplaterCore (= 0.1.0)
+  - Templater/TemplaterActions (0.1.0):
+    - Alamofire (~> 4.2)
+    - CryptoSwift (~> 0.6)
+    - LPXML (~> 0.1)
+    - Templater/TemplaterCore
+  - Templater/TemplaterCore (0.1.0)
+
+DEPENDENCIES:
+  - Nimble (~> 5.1.1)
+  - Quick (~> 1.0.0)
+  - Templater (from `../`)
+
+EXTERNAL SOURCES:
+  Templater:
+    :path: ../
+
+SPEC CHECKSUMS:
+  Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
+  CryptoSwift: a22f6ba238e9ce4d26ee7bf45b9ed82e7122d4a0
+  LPXML: 350d6dc16cb0d493655a9127860ff70ef22cc60e
+  Nimble: 415e3aa3267e7bc2c96b05fa814ddea7bb686a29
+  Quick: 8024e4a47e6cc03a9d5245ef0948264fc6d27cff
+  Templater: 6cc8c5af579bb3fd4d863eef00fd990dd44916d8
+
+PODFILE CHECKSUM: 298b4fd3ba8958c48a4963ac743b857954dc6253
+
+COCOAPODS: 1.2.1
