@@ -39,7 +39,7 @@ Pod::Spec.new do |s|
   s.subspec 'TemplaterActions' do |sp|
     sp.source_files = 'Templater/Classes/TemplaterActions/**/*'
     sp.dependency 'Templater/TemplaterCore'
-    sp.dependency 'CryptoSwift', '~> 0.6'
+    sp.dependency 'CryptoSwift'#, '~> 0.6'
     sp.dependency 'LPXML', '~> 0.1'
     sp.dependency 'Alamofire', '~> 4.2'
   end
