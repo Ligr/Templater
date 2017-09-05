@@ -129,7 +129,7 @@ public final class RequestAction: BaseAction {
 fileprivate extension RequestAction {
 
     var encoding: String.Encoding {
-        guard let encodingStr = attributes["charset"] else {
+        guard let encodingStr = attributes["charset"]?.lowercased() else {
             return .utf8
         }
         switch encodingStr {
