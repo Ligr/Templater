@@ -64,14 +64,14 @@ public final class SearchAction: BaseAction {
                     // store all group values
                     groupValues = [VariableType]()
                     for i in 1 ..< match.numberOfRanges {
-                        let range = match.rangeAt(i)
+                        let range = match.range(at: i)
                         let matchStr = (srcString as NSString).substring(with: range)
                         groupValues.append(VariableType.string(matchStr))
                     }
 
                     // actual results
                     if groupIndex < match.numberOfRanges {
-                        let range = match.rangeAt(groupIndex)
+                        let range = match.range(at: groupIndex)
                         let matchStr = (srcString as NSString).substring(with: range)
                         if let replace = replace {
                             srcString = srcString.replacingOccurrences(of: matchStr, with: replace)

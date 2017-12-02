@@ -22,13 +22,13 @@ public class TableAction: BaseAction {
                 let trRegexPattern = "<tr[\\s\\S]*?>([\\s\\S]*?)</tr>"
                 let tdRegex = try! NSRegularExpression(pattern: tdRegexPattern, options: .caseInsensitive)
                 let trRegex = try! NSRegularExpression(pattern: trRegexPattern, options: .caseInsensitive)
-                trRegex.enumerateMatches(in: inputStr, options: [], range: NSRange(location: 0, length: inputStr.characters.count), using: { (result, flags, exit) in
+                trRegex.enumerateMatches(in: inputStr, options: [], range: NSRange(location: 0, length: inputStr.count), using: { (result, flags, exit) in
                     if let result = result, let trRange = inputStr.rangeFromNSRange(result.range) {
                         let trStr = inputStr.substring(with: trRange)
                         var tdData = [VariableType]()
-                        tdRegex.enumerateMatches(in: trStr, options: [], range: NSRange(location: 0, length: trStr.characters.count), using: { (result, flags, exit) in
+                        tdRegex.enumerateMatches(in: trStr, options: [], range: NSRange(location: 0, length: trStr.count), using: { (result, flags, exit) in
                             if let result = result, result.numberOfRanges > 1 {
-                                if let tdRange = trStr.rangeFromNSRange(result.rangeAt(1)) {
+                                if let tdRange = trStr.rangeFromNSRange(result.range(at: 1)) {
                                     let tdStr = trStr.substring(with: tdRange)
                                     tdData.append(.string(tdStr))
                                 }

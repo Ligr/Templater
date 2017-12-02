@@ -52,13 +52,13 @@ public final class DebugAction: ActionProtocol, ProxyActionProtocol {
             logger?.log("input:\n\(data)")
         }
 
-        innerAction.execute(data: data, context: context) { [weak self] res in
+        innerAction.execute(data: data, context: context) { [weak self] (output, error) in
             if let strongSelf = self {
                 let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                if let output = res.0 {
+                if let output = output {
                     strongSelf.logger?.log("output:\n\(output)")
                 }
-                if let error = res.1 {
+                if let error = error {
                     strongSelf.logger?.log("error:\n\(error)")
                 }
                 if let actionLogs = strongSelf.innerAction.logger?.logs {
@@ -68,7 +68,7 @@ public final class DebugAction: ActionProtocol, ProxyActionProtocol {
                 strongSelf.logger?.log("end action: \(type(of: strongSelf.innerAction)), time elapsed: \(timeElapsedStr)")
             }
 
-            callback(res.0, res.1)
+            callback(output, error)
         }
     }
 
@@ -96,7 +96,7 @@ private class InMemoryLogger: ActionLogger {
 
     func log(_ str: String?) {
         guard let str = str else { return }
-        if logs.characters.count > 0 {
+        if logs.count > 0 {
             logs += "\n\(str)"
         } else {
             logs += "\(str)"

@@ -18,7 +18,7 @@ public extension String {
         repeat {
             matches = regex.matches(in: outStr, options: [], range: NSRange(location: 0, length: outStr.characters.count))
             matches.reversed().forEach { match in
-                let range = match.rangeAt(0)
+                let range = match.range(at: 0)
                 let str = (outStr as NSString).replacingCharacters(in: range, with: "")
                 outStr = str
             }

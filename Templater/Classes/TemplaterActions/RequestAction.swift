@@ -179,12 +179,12 @@ fileprivate extension RequestAction {
 
     func hiddenParams(data: String) -> [String: String] {
         let regex = try! NSRegularExpression(pattern: "<input[^>]*type=[\"|']hidden[\"|']\\s*([\\s\\S]*?)\\s*>", options: [.caseInsensitive])
-        let matches = regex.matches(in: data, options: [], range: NSRange(location: 0, length: data.characters.count))
+        let matches = regex.matches(in: data, options: [], range: NSRange(location: 0, length: data.count))
         let params = matches.reduce([String: String]()) { (params, match) -> [String: String] in
             guard match.numberOfRanges > 0 else {
                 return params
             }
-            let range = match.rangeAt(1)
+            let range = match.range(at: 1)
             var str = (data as NSString).substring(with: range)
             str = str.replacingOccurrences(of: "\n", with: " ")
                 .replacingOccurrences(of: "\t", with: " ")
@@ -193,7 +193,7 @@ fileprivate extension RequestAction {
                 .replacingOccurrences(of: "'", with: "")
                 .replacingOccurrences(of: "  ", with: " ")
             if str.hasSuffix("/") {
-                str = str.substring(to: str.index(before: str.endIndex))
+                str = String(str[..<str.endIndex])//str.substring(to: str.index(before: str.endIndex))
             }
             str = str.trim
             var name: String?
@@ -201,8 +201,8 @@ fileprivate extension RequestAction {
             var idStr: String?
             str.components(separatedBy: " ").forEach { param in
                 if let equalRange = param.range(of: "=") {
-                    let attrName = param.substring(to: equalRange.lowerBound)
-                    let attrValue = removeQuotes(from: param.substring(from: equalRange.upperBound))
+                    let attrName = String(param[..<equalRange.lowerBound])
+                    let attrValue = removeQuotes(from: String(param[equalRange.upperBound...]))
                     switch attrName {
                     case "name":
                         name = attrValue
@@ -225,20 +225,20 @@ fileprivate extension RequestAction {
     }
 
     func removeQuotes(from str: String) -> String {
-        var str = str
+        var str: Substring = Substring(str)
         while str.hasPrefix("\"") {
-            str = str.substring(from: str.index(after: str.startIndex))
+            str = str[str.index(after: str.startIndex)...]
         }
         while str.hasPrefix("'") {
-            str = str.substring(from: str.index(after: str.startIndex))
+            str = str[str.index(after: str.startIndex)...]
         }
-        while str.hasPrefix("\"") {
-            str = str.substring(to: str.index(before: str.endIndex))
+        while str.hasSuffix("\"") {
+            str = str[..<str.endIndex]
         }
-        while str.hasPrefix("'") {
-            str = str.substring(to: str.index(before: str.endIndex))
+        while str.hasSuffix("'") {
+            str = str[..<str.endIndex]
         }
-        return str
+        return String(str)
     }
 
     func requestFinished(with response: DataResponse<String>, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
@@ -275,6 +275,8 @@ fileprivate extension RequestAction {
         var allHeaders = SessionManager.defaultHTTPHeaders
         allHeaders += headers
         configuration.httpAdditionalHeaders = allHeaders
+        configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        configuration.urlCache = nil
         return SessionManager(configuration: configuration)
     }
 
