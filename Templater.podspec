@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Templater'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Framework that process data using templates.'
 
 # This description is used to generate tags and improve search results.
@@ -39,9 +39,9 @@ Pod::Spec.new do |s|
   s.subspec 'TemplaterActions' do |sp|
     sp.source_files = 'Templater/Classes/TemplaterActions/**/*'
     sp.dependency 'Templater/TemplaterCore'
-    sp.dependency 'CryptoSwift', '~> 0.7'
+    sp.dependency 'CryptoSwift', '~> 0.8'
     sp.dependency 'LPXML', '~> 0.1'
-    sp.dependency 'Alamofire', '~> 4.2'
+    sp.dependency 'Alamofire', '~> 4.0'
   end
 
   # s.source_files = 'Templater/Classes/**/*'
