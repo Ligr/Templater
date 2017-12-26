@@ -26,6 +26,10 @@ public final class ResultValidationAction {
         get { return innerAction.attributes }
         set { innerAction.attributes = newValue }
     }
+    public var params: [ActionAttributes] {
+        get { return innerAction.params }
+        set { innerAction.params = newValue }
+    }
 
     fileprivate(set) public var innerAction: ActionProtocol
 

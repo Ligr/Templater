@@ -32,6 +32,7 @@ public protocol ActionProtocol {
     var elseAction: ActionProtocol? { get set }
     var logger: ActionLogger? { get set }
     var attributes: ActionAttributes { get set }
+    var params: [ActionAttributes] { get set }
 
     func execute(data: VariableType?, context: ContextType, callback: @escaping (VariableType?, Error?) -> ())
     func copy() -> ActionProtocol

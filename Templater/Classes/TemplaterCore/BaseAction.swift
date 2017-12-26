@@ -14,6 +14,7 @@ open class BaseAction: ActionProtocol {
     open var elseAction: ActionProtocol? = nil
     open var logger: ActionLogger? = nil
     open var attributes: ActionAttributes
+    open var params: [ActionAttributes] = []
 
     required public init(attributes: ActionAttributes) {
         self.attributes = attributes
@@ -32,6 +33,7 @@ open class BaseAction: ActionProtocol {
             resultNextActions.append(action.copy())
         }
         resultAction.nextActions = resultNextActions
+        resultAction.params = self.params
         return resultAction
     }
 

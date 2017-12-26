@@ -40,12 +40,12 @@ public final class SearchAction: BaseAction {
         let offsetStr = attributes["offset", context]?.stringValue()
         if let start = start, let startRange = srcString.range(of: start, options: [.caseInsensitive]) {
             if let end = end, let endRange = srcString.range(of: end, options: [.caseInsensitive], range: startRange.upperBound ..< srcString.endIndex) {
-                srcString = srcString.substring(with: startRange.lowerBound ..< endRange.upperBound)
+                srcString = String(srcString[startRange.lowerBound ..< endRange.upperBound])
             } else {
-                srcString = srcString.substring(from: startRange.lowerBound)
+                srcString = String(srcString[startRange.lowerBound...])
             }
         } else if let offsetStr = offsetStr, let offset = Int(offsetStr) {
-            srcString = srcString.substring(from: srcString.index(srcString.startIndex, offsetBy: offset))
+            srcString = String(srcString[srcString.index(srcString.startIndex, offsetBy: offset)...])
         }
 
         // calculate final value
@@ -59,8 +59,9 @@ public final class SearchAction: BaseAction {
                 let replace = attributes["replace", context]?.stringValue()
                 let groupIndex = Int(attributes["group", context]?.stringValue() ?? "0") ?? 0
                 let regex = try NSRegularExpression(pattern: regexStr, options: [.caseInsensitive])
-                let matches = regex.matches(in: srcString, options: [], range: NSRange(location: 0, length: srcString.characters.count))
-                let results = matches.map { match -> VariableType in
+                let matches = regex.matches(in: srcString, options: [], range: NSRange(location: 0, length: srcString.count))
+                // reverse itteration due to possible replaces
+                let results = matches.reversed().map { match -> VariableType in
                     // store all group values
                     groupValues = [VariableType]()
                     for i in 1 ..< match.numberOfRanges {
@@ -70,11 +71,10 @@ public final class SearchAction: BaseAction {
                     }
 
                     // actual results
-                    if groupIndex < match.numberOfRanges {
-                        let range = match.range(at: groupIndex)
-                        let matchStr = (srcString as NSString).substring(with: range)
+                    if groupIndex < match.numberOfRanges, let range = Range(match.range(at: groupIndex), in: srcString) {
+                        let matchStr = String(srcString[range])
                         if let replace = replace {
-                            srcString = srcString.replacingOccurrences(of: matchStr, with: replace)
+                            srcString = srcString.replacingOccurrences(of: matchStr, with: replace, range: range)
                         }
                         return VariableType.string(matchStr)
                     } else {

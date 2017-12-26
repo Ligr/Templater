@@ -44,6 +44,15 @@ public final class DebugAction: ActionProtocol, ProxyActionProtocol {
             innerAction.attributes = newValue
         }
     }
+    
+    public var params: [ActionAttributes] {
+        get {
+            return innerAction.params
+        }
+        set {
+            innerAction.params = newValue
+        }
+    }
 
     open func execute(data: VariableType?, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
         let startTime = CFAbsoluteTimeGetCurrent()

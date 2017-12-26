@@ -181,7 +181,7 @@ fileprivate extension RequestAction {
         let regex = try! NSRegularExpression(pattern: "<input[^>]*type=[\"|']hidden[\"|']\\s*([\\s\\S]*?)\\s*>", options: [.caseInsensitive])
         let matches = regex.matches(in: data, options: [], range: NSRange(location: 0, length: data.count))
         let params = matches.reduce([String: String]()) { (params, match) -> [String: String] in
-            guard match.numberOfRanges > 0 else {
+            guard match.numberOfRanges > 1 else {
                 return params
             }
             let range = match.range(at: 1)
