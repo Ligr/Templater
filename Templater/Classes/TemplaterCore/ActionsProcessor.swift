@@ -36,7 +36,7 @@ fileprivate extension ActionsProcessor {
 
     func processQueue(actionsQueue: ActionsQueue, finishHandler: @escaping (Error?) -> ()) {
         if let (action, inData) = actionsQueue.popFirst() {
-            DispatchQueue.global(qos: .background).async {
+            DispatchQueue.global(qos: .utility).async {
                 action.execute(data: inData, context: self.context, callback: { [weak self] (outData, error) in
                     self?.finishedActions.append(action)
                     if let error = error {

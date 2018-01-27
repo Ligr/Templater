@@ -72,7 +72,7 @@ public final class RequestAction: BaseAction {
         processRequestParams(context: context, data: data)
         let responseEncoding = self.encoding
         httpManager = makeSessionManager(headers: headerParams)
-        let dispatchQueue = DispatchQueue.global(qos: .background)
+        let dispatchQueue = DispatchQueue.global(qos: .utility)
         logger?.log("request headers:\n\(headerParams)")
         logger?.log("request params:\n\(requestParams)")
         switch requestType {

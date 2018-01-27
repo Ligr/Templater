@@ -11,7 +11,7 @@ import Foundation
 public class TableAction: BaseAction {
 
     public override func execute(data: VariableType?, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global(qos: .utility).async {
             var resultData = [VariableType]()
             var inputStr = self.attributes["value", context]?.stringValue()
             if inputStr == nil {
