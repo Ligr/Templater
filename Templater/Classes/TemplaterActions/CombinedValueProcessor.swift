@@ -60,8 +60,7 @@ private extension CombinedValueProcessor {
             let expression = text.substring(with: match.range)
             let start = expression.index(expression.startIndex, offsetBy: 2)
             let end = expression.index(before: expression.endIndex)
-            let range = start..<end
-            return expression.substring(with: range)
+            return String(expression[start..<end])
         }
         return keys
     }

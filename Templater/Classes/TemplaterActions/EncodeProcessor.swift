@@ -12,6 +12,7 @@ public struct EncodeProcessor {
 
     public enum EncodeType {
         case lowerCase
+        case escapedChars
         case unknown
     }
 
@@ -26,6 +27,10 @@ public struct EncodeProcessor {
             if let str = variable.stringValue()?.lowercased() {
                 result = .string(str)
             }
+        case .escapedChars:
+            if let str = variable.stringValue(), let encoded = String(htmlEncodedString: str) {
+                result = .string(encoded)
+            }
         case .unknown:
             resultError = ActionError.generic(message: "unsupported encode '\(String(describing: encodeDetails))'")
         }
@@ -36,6 +41,8 @@ public struct EncodeProcessor {
         switch name?.lowercased() {
         case "tolowercase"?:
             return .lowerCase
+        case "escapedchars"?:
+            return .escapedChars
         default:
             return .unknown
         }

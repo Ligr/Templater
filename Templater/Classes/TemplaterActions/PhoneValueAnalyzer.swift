@@ -42,7 +42,7 @@ extension PhoneValueAnalyzer: ValueAnalyzer {
 
         var result: VariableType? = nil
         if searchCountry || searchCode || searchNumber {
-            if let rawFullPhone = context.variable(name: "account.login")?.stringValue(), rawFullPhone.characters.count > 0 {
+            if let rawFullPhone = context.variable(name: "account.login")?.stringValue(), rawFullPhone.count > 0 {
                 let fullPhone = stringByRemovingNonNumericSymbolsFromString(string: rawFullPhone)
                 if searchCountry {
                     result = .string(fullPhone.substring(to: fullPhone.index(fullPhone.startIndex, offsetBy: countryLength)))

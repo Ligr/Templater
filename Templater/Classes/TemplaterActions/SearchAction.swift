@@ -101,7 +101,17 @@ public final class SearchAction: BaseAction {
         }
 
         if let variableName = attributes["var", context]?.stringValue(), let variable = result, resultError == nil {
-            context.registerVariable(name: "var.\(variableName)", value: variable)
+            if let encode = attributes["encode", context]?.stringValue() {
+                let processor = EncodeProcessor()
+                let (newVar, _) = processor.value(variable: variable, encodeDetails: encode)
+                if let newVar = newVar {
+                    context.registerVariable(name: "var.\(variableName)", value: newVar)
+                } else {
+                    context.registerVariable(name: "var.\(variableName)", value: variable)
+                }
+            } else {
+                context.registerVariable(name: "var.\(variableName)", value: variable)
+            }
         }
 
         if result == nil && elseAction != nil {

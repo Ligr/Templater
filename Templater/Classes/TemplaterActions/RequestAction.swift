@@ -178,13 +178,10 @@ fileprivate extension RequestAction {
     }
 
     func hiddenParams(data: String) -> [String: String] {
-        let regex = try! NSRegularExpression(pattern: "<input[^>]*type=[\"|']hidden[\"|']\\s*([\\s\\S]*?)\\s*>", options: [.caseInsensitive])
+        let regex = try! NSRegularExpression(pattern: "<input[^>]*type=[\"|']hidden[\"|']\\s*[\\s\\S]*?\\s*>", options: [.caseInsensitive])
         let matches = regex.matches(in: data, options: [], range: NSRange(location: 0, length: data.count))
         let params = matches.reduce([String: String]()) { (params, match) -> [String: String] in
-            guard match.numberOfRanges > 1 else {
-                return params
-            }
-            let range = match.range(at: 1)
+            let range = match.range(at: 0)
             var str = (data as NSString).substring(with: range)
             str = str.replacingOccurrences(of: "\n", with: " ")
                 .replacingOccurrences(of: "\t", with: " ")
