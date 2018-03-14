@@ -58,7 +58,13 @@ extension ResultValidationAction: ActionProtocol {
                 }
                 callback(outData, error)
             } else {
-                callback(outData, error)
+                // error appeared however action is not required and there is no 'else' action => no need to process inner actions and we can ignore this error
+                if let _ = error, strongSelf.innerAction.elseAction == nil {
+                    strongSelf.innerAction.nextActions = []
+                    callback(outData, nil)
+                } else {
+                    callback(outData, error)
+                }
             }
         }
     }
