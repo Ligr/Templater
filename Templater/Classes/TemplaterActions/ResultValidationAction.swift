@@ -51,7 +51,8 @@ extension ResultValidationAction: ActionProtocol {
                 callback(outData, error)
                 return
             }
-            if error == nil && outData == nil, let required = strongSelf.innerAction.attributes["required", context]?.stringValue(), required.lowercased() == "true" {
+            let required = strongSelf.innerAction.attributes["required", context]?.stringValue()?.lowercased() == "true"
+            if error == nil && outData == nil && required {
                 var error = ActionError.emptyResult
                 if let onError = strongSelf.innerAction.attributes["onError", context]?.stringValue() {
                     error = ActionError.userException(message: onError)
@@ -59,7 +60,7 @@ extension ResultValidationAction: ActionProtocol {
                 callback(outData, error)
             } else {
                 // error appeared however action is not required and there is no 'else' action => no need to process inner actions and we can ignore this error
-                if let _ = error, strongSelf.innerAction.elseAction == nil {
+                if let _ = error, strongSelf.innerAction.elseAction == nil && required == false {
                     strongSelf.innerAction.nextActions = []
                     callback(outData, nil)
                 } else {
