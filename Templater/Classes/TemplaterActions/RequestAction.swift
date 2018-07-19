@@ -15,8 +15,9 @@ public final class RequestAction: BaseAction {
         case referer = "Referer"
         case userAgent = "User-Agent"
     }
-    fileprivate enum ContextKey: String {
-        case lastOpenedUrl = "RequestAction.lastOpenedUrlKey"
+    fileprivate struct ContextKey {
+        static let lastOpenedUrl = "RequestAction.lastOpenedUrlKey"
+        static let sessionManager = "RequestAction.sessionManager"
     }
     fileprivate enum RequestType: String {
         case get = "GET"
@@ -71,7 +72,7 @@ public final class RequestAction: BaseAction {
         processHeaderParams(context: context)
         processRequestParams(context: context, data: data)
         let responseEncoding = self.encoding
-        httpManager = makeSessionManager(headers: headerParams)
+        httpManager = sessionManager(context: context)
         let dispatchQueue = DispatchQueue.global(qos: .utility)
         logger?.log("request headers:\n\(headerParams)")
         logger?.log("request params:\n\(requestParams)")
@@ -121,7 +122,7 @@ public final class RequestAction: BaseAction {
             })
             break
         }
-        context.registerVariable(name: ContextKey.lastOpenedUrl.rawValue, value: .string(url.absoluteString))
+        context.registerVariable(name: ContextKey.lastOpenedUrl, value: .string(url.absoluteString))
     }
 
 }
@@ -156,7 +157,7 @@ fileprivate extension RequestAction {
         if params[HeaderKey.userAgent.rawValue] == nil {
             params[HeaderKey.userAgent.rawValue] = userAgentValue
         }
-        if params[HeaderKey.referer.rawValue] == nil, case let VariableType.string(lastOpenedUrl)? = context.variable(name: ContextKey.lastOpenedUrl.rawValue) {
+        if params[HeaderKey.referer.rawValue] == nil, case let VariableType.string(lastOpenedUrl)? = context.variable(name: ContextKey.lastOpenedUrl) {
             params[HeaderKey.referer.rawValue] = lastOpenedUrl
         }
         headerParams = params
@@ -267,10 +268,19 @@ fileprivate extension RequestAction {
         return true
     }
 
-    func makeSessionManager(headers: [String: String]) -> Alamofire.SessionManager {
-        let configuration = URLSessionConfiguration.default
-        var allHeaders = SessionManager.defaultHTTPHeaders
-        allHeaders += headers
+    func sessionManager(context: ContextType) -> Alamofire.SessionManager {
+        if case .any(let sessionManager)? = context.variable(name: ContextKey.sessionManager), let session = sessionManager as? Alamofire.SessionManager {
+            return session
+        } else {
+            let session = makeSessionManager()
+            context.registerVariable(name: ContextKey.sessionManager, value: .any(session))
+            return session
+        }
+    }
+
+    func makeSessionManager() -> Alamofire.SessionManager {
+        let configuration = URLSessionConfiguration.ephemeral
+        let allHeaders = SessionManager.defaultHTTPHeaders
         configuration.httpAdditionalHeaders = allHeaders
         configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         configuration.urlCache = nil
