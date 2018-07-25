@@ -100,7 +100,7 @@ public final class RequestAction: BaseAction {
                 callback(nil, ActionError.generic(message: "<request>: POST_DATA requires 'data' parameter"))
                 return
             }
-            httpManager?.upload(data, to: url).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+            httpManager?.upload(data, to: url, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                 self?.requestFinished(with: response, context: context, callback: callback)
             }
         case .postMultipart:
