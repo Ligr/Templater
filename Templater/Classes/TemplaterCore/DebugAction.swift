@@ -54,7 +54,7 @@ public final class DebugAction: ActionProtocol, ProxyActionProtocol {
         }
     }
 
-    open func execute(data: VariableType?, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
+    public func execute(data: VariableType?, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
         let startTime = CFAbsoluteTimeGetCurrent()
         logger?.log("start action: \(type(of: innerAction))")
         if let data = data {

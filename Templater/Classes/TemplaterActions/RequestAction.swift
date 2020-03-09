@@ -29,7 +29,7 @@ public final class RequestAction: BaseAction {
 
     fileprivate let valueProcessor: ValueProcessor
     fileprivate let userAgentValue = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0"//"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
-    fileprivate var httpManager: Alamofire.SessionManager?
+    fileprivate var httpManager: Alamofire.Session?
 
     public var includeHiddenParams: (include: Bool, tagValue: String?)?
     public var requestParams = [String: String]()
@@ -78,20 +78,20 @@ public final class RequestAction: BaseAction {
         logger?.log("request params:\n\(requestParams)")
         switch requestType {
         case .get:
-            httpManager?.request(url, method: .get, parameters: requestParams, encoding: URLEncoding.default, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+            httpManager?.request(url, method: .get, parameters: requestParams, encoder: URLEncodedFormParameterEncoder.default, headers: HTTPHeaders(headerParams)).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                 self?.requestFinished(with: response, context: context, callback: callback)
             }
         case .post:
-            httpManager?.request(url, method: .post, parameters: requestParams, encoding: URLEncoding.default, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+            httpManager?.request(url, method: .post, parameters: requestParams, encoder: URLEncodedFormParameterEncoder.default, headers: HTTPHeaders(headerParams)).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                 self?.requestFinished(with: response, context: context, callback: callback)
             }
         case .put:
             if let data = requestParams["data"], let json = jsonFromRawString(data) {
-                httpManager?.upload(json, to: url, method: .put, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+                httpManager?.upload(json, to: url, method: .put, headers: HTTPHeaders(headerParams)).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                     self?.requestFinished(with: response, context: context, callback: callback)
                 }
             } else {
-                httpManager?.request(url, method: .put, parameters: requestParams, encoding: URLEncoding.httpBody, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+                httpManager?.request(url, method: .put, parameters: requestParams, encoding: URLEncoding.httpBody, headers: HTTPHeaders(headerParams)).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                     self?.requestFinished(with: response, context: context, callback: callback)
                 }
             }
@@ -100,7 +100,7 @@ public final class RequestAction: BaseAction {
                 callback(nil, ActionError.generic(message: "<request>: POST_DATA requires 'data' parameter"))
                 return
             }
-            httpManager?.upload(data, to: url, headers: headerParams).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+            httpManager?.upload(data, to: url, headers: HTTPHeaders(headerParams)).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
                 self?.requestFinished(with: response, context: context, callback: callback)
             }
         case .postMultipart:
@@ -110,16 +110,25 @@ public final class RequestAction: BaseAction {
                         formData.append(paramData, withName: param.key)
                     }
                 }
-            }, to: url, encodingCompletion: { (encodingResult) in
-                switch encodingResult {
-                case .success(let request, _, _):
-                    request.validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
-                        self?.requestFinished(with: response, context: context, callback: callback)
-                    }
-                case .failure(let error):
-                    callback(nil, error)
+                }, to: url).validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+                    self?.requestFinished(with: response, context: context, callback: callback)
                 }
-            })
+//            httpManager?.upload(multipartFormData: { (formData) in
+//                for param in self.requestParams {
+//                    if let paramData = param.value.data(using: .utf8) {
+//                        formData.append(paramData, withName: param.key)
+//                    }
+//                }
+//            }, to: url, encodingCompletion: { (encodingResult) in
+//                switch encodingResult {
+//                case .success(let request, _, _):
+//                    request.validate().responseString(queue: dispatchQueue, encoding: responseEncoding) { [weak self] (response) in
+//                        self?.requestFinished(with: response, context: context, callback: callback)
+//                    }
+//                case .failure(let error):
+//                    callback(nil, error)
+//                }
+//            })
             break
         }
         context.registerVariable(name: ContextKey.lastOpenedUrl, value: .string(url.absoluteString))
@@ -239,7 +248,7 @@ fileprivate extension RequestAction {
         return String(str)
     }
 
-    func requestFinished(with response: DataResponse<String>, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
+    func requestFinished(with response: AFDataResponse<String>, context: ContextType, callback: @escaping (VariableType?, Error?) -> ()) {
         var result: VariableType? = nil
         var resultError: Error? = nil
         defer {
@@ -262,14 +271,14 @@ fileprivate extension RequestAction {
     }
 
     func needIgnoreStatusCode(code: Int) -> Bool {
-        guard let codesStr = attributes["ignore"]?.components(separatedBy: "|"), codesStr.map( { Int($0) } ).flatMap( { $0 } ).contains(code) else {
+        guard let codesStr = attributes["ignore"]?.components(separatedBy: "|"), codesStr.map( { Int($0) } ).compactMap( { $0 } ).contains(code) else {
             return false
         }
         return true
     }
 
-    func sessionManager(context: ContextType) -> Alamofire.SessionManager {
-        if case .any(let sessionManager)? = context.variable(name: ContextKey.sessionManager), let session = sessionManager as? Alamofire.SessionManager {
+    func sessionManager(context: ContextType) -> Alamofire.Session {
+        if case .any(let sessionManager)? = context.variable(name: ContextKey.sessionManager), let session = sessionManager as? Alamofire.Session {
             return session
         } else {
             let session = makeSessionManager()
@@ -278,13 +287,13 @@ fileprivate extension RequestAction {
         }
     }
 
-    func makeSessionManager() -> Alamofire.SessionManager {
+    func makeSessionManager() -> Alamofire.Session {
         let configuration = URLSessionConfiguration.ephemeral
-        let allHeaders = SessionManager.defaultHTTPHeaders
-        configuration.httpAdditionalHeaders = allHeaders
+        let allHeaders = HTTPHeaders.default
+        configuration.httpAdditionalHeaders = allHeaders.dictionary
         configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         configuration.urlCache = nil
-        return SessionManager(configuration: configuration)
+        return Session(configuration: configuration)
     }
 
     func jsonFromRawString(_ string: String) -> Data? {

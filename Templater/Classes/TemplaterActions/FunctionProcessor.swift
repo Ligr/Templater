@@ -45,7 +45,7 @@ public struct FunctionProcessor {
     public func value(variable: VariableType, functionDetails: String) -> (result: VariableType?, error: Error?) {
         var result: VariableType? = nil
         var resultError: Error? = nil
-        var params = functionDetails.components(separatedBy: ",")
+        let params = functionDetails.components(separatedBy: ",")
         if params.count > 1 {
             let function = functionType(name: params.first)
             let functionParams = Array(params[1 ..< params.count])

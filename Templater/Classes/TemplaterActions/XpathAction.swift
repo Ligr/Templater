@@ -30,7 +30,7 @@ public class XpathAction: BaseAction {
         if let inputData = inputData, let xpath = attributes["xpath", context]?.stringValue() {
             let xml = LPXML(htmlString: inputData, encoding: String.Encoding.utf8.rawValue)
             if let str = xml?.content(forXpath: xpath) {
-                result = VariableType.string(str)
+                result = VariableType.string(str.joined(separator: ""))
             }
         } else {
             if inputData == nil {

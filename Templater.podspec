@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/Ligr/Templater.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '12.0'
 
   s.default_subspecs = 'TemplaterCore', 'TemplaterActions'
 
@@ -39,9 +39,9 @@ Pod::Spec.new do |s|
   s.subspec 'TemplaterActions' do |sp|
     sp.source_files = 'Templater/Classes/TemplaterActions/**/*'
     sp.dependency 'Templater/TemplaterCore'
-    sp.dependency 'CryptoSwift', '~> 0.8'
+    sp.dependency 'CryptoSwift', '~> 1.0'
     sp.dependency 'LPXML', '~> 0.1'
-    sp.dependency 'Alamofire', '~> 4.0'
+    sp.dependency 'Alamofire', '~> 5.0'
   end
 
   # s.source_files = 'Templater/Classes/**/*'
